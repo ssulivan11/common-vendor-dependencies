@@ -1,6 +1,5 @@
-<h1 align='center'>
-<img class="emoji" title=":package:" alt=":package:" src="https://gitlab.deveng.systems/assets/1F4E6-e82bf5accebb65136e897c15607eef635fb79fd7b2d8c8e19a9eb00b6786918c.png" height="80" width="80" align="absmiddle"><br />Common Vendor Dependencies</h1>
-<p align='center'><small>Vendor Bundle for UI Projects<small></p>
+<h1>📦 Common Vendor Dependencies</h1>
+<p><small>Vendor Bundle for UI Projects<small></p>
 
 ## Included Packages
 
@@ -45,7 +44,7 @@ render () => (
 You might not use a package, but an application down the customers journey does. For example, if you do not use DayJS or Sentry then do not load it in your client entry point, for performance gains and instead use the helper function below in a componentDidMount or useEffect:
 
 ```js
-useEffect(() => preFetchCommonScripts({ dayjs: true, sentry: true }), [])
+useEffect(() => preFetchCommonScripts({ dayjs: true, sentry: true }), []);
 ```
 
 ### Webpack Config
@@ -53,20 +52,20 @@ useEffect(() => preFetchCommonScripts({ dayjs: true, sentry: true }), [])
 Code example of webpack externals:
 
 ```js
-import { webpackExternals } from 'common-vendor-dependencies'
+import { webpackExternals } from "common-vendor-dependencies";
 
-externals: isProduction ? webpackExternals() : {}
+externals: isProduction ? webpackExternals() : {};
 ```
 
 Developers can include new externals mappings or exclude common vendor externals:
 
 ```js
 const opts = {
-  include: { 'video.js': 'videojs' },
-  exclude: ['redux-saga'],
-}
+  include: { "video.js": "videojs" },
+  exclude: ["redux-saga"]
+};
 
-externals: isProduction ? webpackExternals(opts) : {}
+externals: isProduction ? webpackExternals(opts) : {};
 ```
 
 Note: excluding externals is not recommended. It may be needed in the case a developer is aliasing a module in their webpack configuration.
