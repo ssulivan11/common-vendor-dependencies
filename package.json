@@ -1,0 +1,115 @@
+{
+  "name": "common-vendor-dependencies",
+  "version": "3.0.1",
+  "description": "Common vendor packages shared across teams",
+  "main": "dist/index.min.js",
+  "engines": {
+    "node": ">=10.13.0",
+    "npm": ">=5"
+  },
+  "scripts": {
+    "--------- DEVELOPMENT ----------------------": "",
+    "build": "yarn dist:remove && webpack -p --config webpack.config.vendors.js && webpack -p --config webpack.config.lib.js && yarn dist:clean",
+    "build:staging": "NODE_ENV=staging yarn build",
+    "prepublish": "yarn build",
+    "--------- HELPERS --------------------------": "",
+    "bundlesize": "yarn build && bundlesize",
+    "lint": "eslint --ext .ts --ext .tsx --ext .js src/",
+    "dist:remove": "node -e 'require(\"./config/nodeScripts.js\").remove()'",
+    "dist:clean": "node -e 'require(\"./config/nodeScripts.js\").clean()'",
+    "info": "env | grep npm_package_",
+    "format": "prettier --write \"**/*.{json,md,js,jsx,css,scss}\"",
+    "nuke": "yarn cache clean && rm -rf node_modules dist && yarn"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.{json,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "yarn bundlesize"
+    }
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@sentry/browser": "5.6.3",
+    "@sentry/hub": "5.6.1",
+    "@sentry/utils": "5.6.1",
+    "connected-react-router": "6.5.2",
+    "dayjs": "1.8.16",
+    "react": "16.10.1",
+    "react-dom": "16.10.1",
+    "react-redux": "7.1.1",
+    "react-router": "5.1.1",
+    "react-router-dom": "5.1.1",
+    "redux": "4.0.4",
+    "redux-saga": "0.16.2",
+    "styled-components": "4.4.0",
+    "superagent": "3.8.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.2",
+    "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
+    "@babel/plugin-transform-typescript": "^7.6.0",
+    "@babel/preset-env": "^7.6.2",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.6.0",
+    "@types/node": "^12.7.11",
+    "@types/react": "^16.9.5",
+    "@types/react-dom": "^16.9.1",
+    "@types/webpack-env": "^1.14.0",
+    "@typescript-eslint/eslint-plugin": "^2.3.3",
+    "@typescript-eslint/parser": "^2.3.3",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
+    "bundlesize": "^0.18.0",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-config-react": "^1.1.7",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.16.0",
+    "fs-extra": "^8.1.0",
+    "husky": "^3.0.7",
+    "lint-staged": "^9.4.0",
+    "prettier": "^1.18.2",
+    "terser-webpack-plugin": "^1.2.3",
+    "typescript": "^3.6.3",
+    "webpack": "^4.41.0",
+    "webpack-bundle-analyzer": "^3.5.2",
+    "webpack-cli": "^3.3.9"
+  },
+  "bundlesize": [
+    {
+      "path": "./dist/commonvendor-react.min.js",
+      "maxSize": "55.95 kB",
+      "compression": "brotli"
+    },
+    {
+      "path": "./dist/commonvendor-sentry.min.js",
+      "maxSize": "18 kB",
+      "compression": "brotli"
+    },
+    {
+      "path": "./dist/commonvendor-superagent.min.js",
+      "maxSize": "5.1kB",
+      "compression": "brotli"
+    },
+    {
+      "path": "./dist/commonvendor-styledComponents.min.js",
+      "maxSize": "15.7 kB",
+      "compression": "brotli"
+    },
+    {
+      "path": "./dist/commonvendor-dayjs.min.js",
+      "maxSize": "2.85 kB",
+      "compression": "brotli"
+    }
+  ]
+}

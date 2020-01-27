@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "rootDirs": ["src"],
+    "esModuleInterop": true,
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "module": "umd",
+    "target": "es5",
+    "lib": ["es6", "dom", "es2017"],
+    "jsx": "react",
+    "moduleResolution": "node",
+    "allowJs": true,
+    "pretty": true,
+    "newLine": "lf",
+    "stripInternal": true,
+    "strict": false,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noEmitOnError": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

@@ -1,0 +1,9 @@
+FROM node:10.13.0-alpine
+MAINTAINER Scott Sullivan <ssulivan11@gmail.com>
+
+RUN apk update
+RUN apk add make gcc g++ python
+RUN apk upgrade yarn npm
+RUN npm install node-gyp
+
+WORKDIR /project

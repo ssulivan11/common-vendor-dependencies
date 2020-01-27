@@ -1,0 +1,156 @@
+#!/usr/bin/env groovy
+
+import groovy.json.JsonOutput
+
+@Library('global-pipeline-shared-libs') _
+
+pipeline {
+  agent {
+    node {
+      label 'ec2'
+    }
+  }
+  environment {
+    VENDOR_VERSION = null
+    VENDOR_CHECK_URL = null
+    CMD = null
+  }
+  stages {
+    stage('Dockerise NPMDependencies') {
+      steps {
+        sh "docker build -f jenkins/Build_Dockerfile -t uip ."
+      }
+    }
+
+    stage("Validate Vendor Version") {
+      steps{
+        script {
+          VENDOR_VERSION = sh(
+            script: 'cat package.json | jq -r .version | cut -f1 -d"-"',
+            returnStdout: true
+          ).trim()
+          VENDOR_VERSION = "$VENDOR_VERSION"
+
+          VENDOR_CHECK_URL = "https://ssullivan.info/assets/common/vendor/${VENDOR_VERSION}/commonvendor.min.js"
+
+          CMD = "curl --write-out %{http_code} --silent --output /dev/null ${VENDOR_CHECK_URL}"
+
+          sh "${CMD} > commandResult"
+          env.status = readFile('commandResult').trim()
+          if (env.status == '200') {
+            sh "set +x echo -e '\n\n\n> -------------------------------------------------------------------------------------------------------------------\n> !! ERROR: Common-Vendor-Dependencies v${VENDOR_VERSION} was already added to s3-bucket\n> https://ssullivan.info/common/vendor/${VENDOR_VERSION}/commonvendor.min.js\n> https://ssullivan.info/common/vendor/${VENDOR_VERSION}/commonvendor.min.js\n> -------------------------------------------------------------------------------------------------------------------\n\n\n'"
+            sh "exit 1"
+            currentBuild.result = 'FAILURE'
+          } else {
+            sh "set +x echo -e '> ----- \nAdding a new version! Common-Vendor-Dependendies v${VENDOR_VERSION} to s3-bucket\n -----'"
+          }
+        }
+      }
+    }
+
+    stage('Yarn Install') {
+      steps {        
+        sh "docker run -v \$(pwd)/:/project uip yarn"
+      }
+    }
+
+    stage("Build Prod Bundle &&  Bundlesize Check") {
+      steps {
+        sh "docker run -v \$(pwd)/:/project uip yarn bundlesize"
+      }
+    }
+
+    stage("Publish Prod File to s3") {
+      steps {
+        sh '''
+          VENDOR_VERSION_PACKAGE=$(cat package.json \
+            | grep version \
+            | head -1 \
+            | awk -F: '{ print $2 }' \
+            | sed 's/[",]//g')
+          VENDOR_VERSION=$(echo $VENDOR_VERSION_PACKAGE | tr -d ' ')
+
+          aws s3 cp dist/ s3://ssullivan.info/assets/common/vendor/$VENDOR_VERSION/ --recursive
+        '''
+      }
+    }
+
+    stage('Validate S3 Files') {
+      steps {
+        script {
+          VENDOR_VERSION = sh(
+            script: 'cat package.json | jq -r .version | cut -f1 -d"-"',
+            returnStdout: true
+          ).trim()
+          VENDOR_VERSION = "$VENDOR_VERSION"
+
+          VENDOR_CHECK_URL = "https://ssullivan.info/assets/common/vendor/${VENDOR_VERSION}/commonvendor.min.js"
+          CMD = "curl --write-out %{http_code} --silent --output /dev/null ${VENDOR_CHECK_URL}"
+
+          sh "${CMD} > commandResult"
+          env.status = readFile('commandResult').trim()
+          if (env.status == '200') {
+            currentBuild.result = "SUCCESS"
+          } else {
+            currentBuild.result = "FAILURE"
+            sh "set +x echo -e '> ----- \nCannot find file in s3 bucket!\n${VENDOR_CHECK_URL} is returning 200!! \n -----'"
+            sh "exit 1" 
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      // script {
+      //   def attachments = [
+      //     [
+      //       color: getDeployColor(),
+      //       fields: [
+      //         [
+      //           title: getDeployMessage(),
+      //           value: "",
+      //           short: true
+      //         ]
+      //       ],
+      //       actions: [
+      //         [
+      //           type: "button",
+      //           text: "Common Vendor Bundle",
+      //           url: VENDOR_CHECK_URL,
+      //           style: "primary"
+      //         ],
+      //         [
+      //           type: "button",
+      //           text: "View Jenkins",
+      //           url: env.BUILD_URL
+      //         ]
+      //       ]
+      //     ]
+      //   ]
+      //   def slackURL = ""
+      //   def payload = JsonOutput.toJson([
+      //     username: "Jenkins",
+      //     icon_url: "",
+      //     channel: "-ui-devs-",
+      //     attachments: attachments
+      //   ])
+
+      //   sh "curl -X POST --data-urlencode \'payload=${payload}\' ${slackURL}"
+      // }
+      cleanWs()
+    }
+  }
+}
+
+
+def getDeployMessage () {
+  return "Common-Vendors-Dependencies v${VENDOR_VERSION}"
+  // return "Common Vendor Build Issue with v${VENDOR_VERSION}"
+}
+
+def getDeployColor () {
+  return "good"
+  // return "danger" // FAILURE, UNSTABLE, ABORTED and NOT_BUILT
+}
