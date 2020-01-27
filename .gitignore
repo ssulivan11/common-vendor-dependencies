@@ -1,0 +1,10 @@
+.env
+node_modules
+client.crx
+client.pem
+randomGiphy.zip
+.DS_Store
+src/options.js
+coverage
+dist
+coverage
