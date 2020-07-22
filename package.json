@@ -9,17 +9,17 @@
   },
   "scripts": {
     "--------- DEVELOPMENT ----------------------": "",
-    "build": "yarn dist:remove && webpack -p --config webpack.config.vendors.js && webpack -p --config webpack.config.lib.js && yarn dist:clean",
-    "build:staging": "NODE_ENV=staging yarn build",
-    "prepublish": "yarn build",
+    "build": "npm run dist:remove && webpack -p --config webpack.config.vendors.js && webpack -p --config webpack.config.lib.js && npm run dist:clean",
+    "build:staging": "NODE_ENV=staging npm run build",
+    "prepublish": "npm run build",
     "--------- HELPERS --------------------------": "",
-    "bundlesize": "yarn build && bundlesize",
+    "bundlesize": "npm run build && bundlesize",
     "lint": "eslint --ext .ts --ext .tsx --ext .js src/",
     "dist:remove": "node -e 'require(\"./config/nodeScripts.js\").remove()'",
     "dist:clean": "node -e 'require(\"./config/nodeScripts.js\").clean()'",
     "info": "env | grep npm_package_",
     "format": "prettier --write \"**/*.{json,md,js,jsx,css,scss}\"",
-    "nuke": "yarn cache clean && rm -rf node_modules dist && yarn"
+    "nuke": "npm run cache clean && rm -rf node_modules dist && npm i"
   },
   "lint-staged": {
     "*.{js,jsx}": [
@@ -34,7 +34,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged",
-      "pre-push": "yarn bundlesize"
+      "pre-push": "npm run bundlesize"
     }
   },
   "license": "ISC",

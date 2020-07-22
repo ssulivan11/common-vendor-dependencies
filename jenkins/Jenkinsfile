@@ -48,15 +48,15 @@ pipeline {
       }
     }
 
-    stage('Yarn Install') {
+    stage('NPM Install') {
       steps {        
-        sh "docker run -v \$(pwd)/:/project uip yarn"
+        sh "docker run -v \$(pwd)/:/project uip npm i"
       }
     }
 
     stage("Build Prod Bundle &&  Bundlesize Check") {
       steps {
-        sh "docker run -v \$(pwd)/:/project uip yarn bundlesize"
+        sh "docker run -v \$(pwd)/:/project uip npm run bundlesize"
       }
     }
 

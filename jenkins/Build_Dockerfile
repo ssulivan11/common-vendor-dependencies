@@ -3,7 +3,7 @@ MAINTAINER Scott Sullivan <ssulivan11@gmail.com>
 
 RUN apk update
 RUN apk add make gcc g++ python
-RUN apk upgrade yarn npm
+RUN apk upgrade npm
 RUN npm install node-gyp
 
 WORKDIR /project
